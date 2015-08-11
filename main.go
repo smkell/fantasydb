@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 )
@@ -81,4 +82,23 @@ func importStatsCommand(c *cli.Context) {
 	fmt.Println("Processing stats with type:", statType)
 	fmt.Println("Processing stats for year:", yearInt)
 	fmt.Println("Importing from sources:", args)
+
+	for _, src := range args {
+		fmt.Println("Importing stats from", src)
+		if filepath.Ext(src) == ".csv" {
+			fmt.Println("Detecting format 'csv' from the extension")
+			stats, err := parseCsvStatsFromFile(src)
+			if stats == nil || err != nil {
+				fmt.Println("Error: failed to parse stats from file")
+				os.Exit(1)
+			}
+		}
+	}
+}
+
+type stat struct {
+}
+
+func parseCsvStatsFromFile(path string) ([]stat, error) {
+	return nil, nil
 }
