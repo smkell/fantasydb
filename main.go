@@ -49,7 +49,6 @@ Otherwise the input will be read from STDIN.`,
 	}
 	app.Action = func(c *cli.Context) {
 		fmt.Println("Fantasy Database v0.1.0")
-		fmt.Println(c.Args())
 	}
 
 	app.Run(os.Args)
