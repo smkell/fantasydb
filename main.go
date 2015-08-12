@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
 	"os"
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/codegangsta/cli"
 )
 
 func main() {
@@ -26,7 +27,7 @@ func main() {
 		{
 			Name:  "import",
 			Usage: "imports statistics from a url into the database",
-			Description: `The import command is used to import statistics into the database. These statistics may be 
+			Description: `The import command is used to import statistics into the database. These statistics may be
 projections for a particular year, or they might be actual statistics from a previous year.
 
 The command supports inputs in the following formats: csv, json.
@@ -87,18 +88,6 @@ func importStatsCommand(c *cli.Context) {
 		fmt.Println("Importing stats from", src)
 		if filepath.Ext(src) == ".csv" {
 			fmt.Println("Detecting format 'csv' from the extension")
-			stats, err := parseCsvStatsFromFile(src)
-			if stats == nil || err != nil {
-				fmt.Println("Error: failed to parse stats from file")
-				os.Exit(1)
-			}
 		}
 	}
-}
-
-type stat struct {
-}
-
-func parseCsvStatsFromFile(path string) ([]stat, error) {
-	return nil, nil
 }
