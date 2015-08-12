@@ -86,6 +86,7 @@ func importStatsCommand(c *cli.Context) {
 
 	for _, src := range args {
 		fmt.Println("Importing stats from", src)
+
 		if filepath.Ext(src) == ".csv" {
 			fmt.Println("Detecting format 'csv' from the extension")
 			file, err := os.Open(src)
@@ -94,7 +95,7 @@ func importStatsCommand(c *cli.Context) {
 				os.Exit(1)
 			}
 
-			players, err := ParseCsv(file, yearInt, statType == "projected")
+			players, err := ParseCsv(file, yearInt, statType == "projection")
 			if err != nil {
 				fmt.Println("ERROR:", err)
 				os.Exit(1)
@@ -106,6 +107,11 @@ func importStatsCommand(c *cli.Context) {
 			repo := NewMongoDBRepository(c.GlobalString("db"))
 			repo.RemoveAllPlayers()
 			for _, player := range players {
+				actualStats, err := FetchStats(player, 0, yearInt)
+				if err != nil {
+					fmt.Println("ERROR:", err)
+				}
+				player.SeasonStats = append(player.SeasonStats, actualStats...)
 				repo.UpsertPlayer(player)
 			}
 		}
