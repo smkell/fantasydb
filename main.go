@@ -18,7 +18,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "db",
-			Value:  "mongodb://localhost:27017 /fantasydb",
+			Value:  "mongodb://localhost:27017/fantasydb",
 			Usage:  "database backend to connect to",
 			EnvVar: "FANTASYDB_DB",
 		},
@@ -88,6 +88,26 @@ func importStatsCommand(c *cli.Context) {
 		fmt.Println("Importing stats from", src)
 		if filepath.Ext(src) == ".csv" {
 			fmt.Println("Detecting format 'csv' from the extension")
+			file, err := os.Open(src)
+			if err != nil {
+				fmt.Println("ERROR:", err)
+				os.Exit(1)
+			}
+
+			players, err := ParseCsv(file, yearInt, statType == "projected")
+			if err != nil {
+				fmt.Println("ERROR:", err)
+				os.Exit(1)
+			}
+			fmt.Printf("Parsed %d %s stats for year %d\n", len(players), statType, yearInt)
+
+			// Adding records to mongodb
+			fmt.Println("Writing player stats to database.", c.GlobalString("db"))
+			repo := NewMongoDBRepository(c.GlobalString("db"))
+			repo.RemoveAllPlayers()
+			for _, player := range players {
+				repo.UpsertPlayer(player)
+			}
 		}
 	}
 }
