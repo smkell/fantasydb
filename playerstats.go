@@ -14,4 +14,5 @@ type SeasonStat struct {
 	Year      int64  `bson:"year"`
 	Projected bool   `bson:"projected"`
 	Team      string `bson:"team"`
+	ByeWeek   int64  `bson:"bye_week"`
 }
