@@ -1,18 +1,19 @@
 db.players.aggregate([
-    { $project: { _id: 1, last_name: 1, first_name: 1, season_stats: 1 } },
+    { $project: { _id: 1, last_name: 1, first_name: 1, position: 1, season_stats: 1 } },
     { $unwind: "$season_stats" },
-    { $project: { 
-        _id: 1, 
-        last_name: 1, 
-        first_name: 1, 
-        completions: "$season_stats.completions", 
-        passing_tds: "$season_stats.passing_tds", 
+    { $project: {
+        _id: 1,
+        last_name: 1,
+        first_name: 1,
+        position: 1,
+        completions: "$season_stats.completions",
+        passing_tds: "$season_stats.passing_tds",
         passing_td_pts: { $multiply: [4 ,"$season_stats.passing_tds" ] },
         passing_yards: "$season_stats.passing_yards",
         passing_yards_pts: { $multiply: [ 1, { $divide: [ "$season_stats.passing_yards", 25 ] } ] },
-        interceptions: "$season_stats.interceptions", 
+        interceptions: "$season_stats.interceptions",
         interception_pts: { $multiply: [ -2, "$season_stats.interceptions" ] },
-        rush_attempts: "$season_stats.rush_attempts", 
+        rush_attempts: "$season_stats.rush_attempts",
         rush_yards: "$season_stats.rush_yards",
         rush_yards_pts: { $multiply: [ 1, { $divide: [ "$season_stats.rush_yards", 10 ] } ] },
         rush_tds: "$season_stats.rush_tds",
@@ -25,7 +26,7 @@ db.players.aggregate([
         receive_yard_pts: { $multiply: [ 1, { $divide: [ "$season_stats.receive_yards", 10 ] } ] },
         receive_tds: "$season_stats.receive_tds",
         receive_td_pts: { $multiply: [ 6, "$season_stats.receive_tds" ] },
-        fantasy_points: { $add: [ 
+        fantasy_points: { $add: [
             { $multiply: [4 ,"$season_stats.passing_tds" ] },
             { $multiply: [ 1, { $divide: [ "$season_stats.passing_yards", 25 ] } ] },
             { $multiply: [ -2, "$season_stats.interceptions" ] },
@@ -37,8 +38,9 @@ db.players.aggregate([
             { $multiply: [ 6, "$season_stats.receive_tds" ] },
          ] },
         } },
-    { $group: { 
-        _id: { $concat: [ "$last_name", ", ", "$first_name" ] }, 
+    { $group: {
+        _id: { $concat: [ "$last_name", ", ", "$first_name" ] },
+        position: { $first: "$position" },
         avg_completions: { $avg: "$completions" },
         avg_passing_tds: { $avg: "$passing_tds" },
         avg_passing_td_pts: { $avg: "$passing_td_pts" },
@@ -60,7 +62,7 @@ db.players.aggregate([
         avg_receive_tds: { $avg: "$receive_tds" },
         avg_receive_td_pts: { $avg: "$receive_td_pts" },
         avg_fantasy_points: { $avg: "$fantasy_points" },
-        } 
+        }
     },
     { $sort: { avg_fantasy_points: -1 } },
 ])

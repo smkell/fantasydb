@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 func FetchStats(player Player, startYear, endYear int64) ([]SeasonStat, error) {
@@ -31,7 +32,8 @@ func FetchStats(player Player, startYear, endYear int64) ([]SeasonStat, error) {
 		FUMBLES_POS       = 16
 	)
 
-	searchUrl := FOOTBALLDB_URL + "/players/players.html?q=" + player.LastName
+	searchName := strings.Split(player.LastName, " ")[0]
+	searchUrl := FOOTBALLDB_URL + "/players/players.html?q=" + searchName
 
 	doc, err := goquery.NewDocument(searchUrl)
 	if err != nil {
@@ -40,7 +42,8 @@ func FetchStats(player Player, startYear, endYear int64) ([]SeasonStat, error) {
 
 	fullName := player.LastName + ", " + player.FirstName
 
-	s := doc.Find("table.statistics > tbody > tr > td > a:contains(\"" + fullName + "\")").First()
+	table := doc.Find("table.statistics > tbody > tr > td > a:contains(\"" + fullName + "\")").Parent().Parent().Has("td:contains(\"" + player.Position + "\")")
+	s := table.Find("a:contains(\"" + fullName + "\")")
 	statUrl, found := s.Attr("href")
 
 	if !found {
